@@ -1,27 +1,36 @@
 class Game
-	attr_accessor :player1, :player2
 	def initialize
 		@board = [" ", " ", " ", " ", " ", " ", " ", " ", " "]
 		@player1 = Player.new
 		@player2 = Player.new
 		@current_player = @player1
+		@current_player_name = "Player 1"
 		@won = false
+    @tie = false 
 		@winner = ""
 	end
 
 	def choose_position
-		puts "#{@current_player.to_s} Choose a position on the board to place your nought or cross: "
+		valid_move = false
+		while valid_move == false
+		puts "#{@current_player_name} Choose a position on the board to place your nought or cross: "
 		pos = gets.chomp.to_i # Inputs the position they want to select
-		if @board[pos] == " " # If the position is empty then they are able to assign their symbol to the board
-			@board[pos] = @current_player.symbol
+			if @board[pos] == " " # If the position is empty then they are able to assign their symbol to the board
+				@board[pos] = @current_player.symbol
+				valid_move = true
+			else
+				puts "That isn't a valid position choice! Try again!"
+			end
 		end
 	end
 	
 	def swap_player
 		if @current_player == @player1
 			@current_player = @player2
+			@current_player_name = "Player 2"
 		else
 			@current_player = @player1
+			@current_player_name = "Player 1"
 		end
 	end
 	
@@ -51,7 +60,7 @@ class Game
 			@won = true
 		
 		elsif @board.all? { |symb| symb != " "} # Checks if it's a draw. Ends the game.
-			@won = true
+			@tie = true
 
 		end
 	end
@@ -67,23 +76,27 @@ class Game
 	end
 
 	def play
-		while @won == false # Win loop, loops until the game finishes
+		while @won == false && @tie == false # Game loop, loops until the game finishes by a player winning or a player tieing.
 			display
 			choose_position
 			check_win
 			swap_player
 		end
+		swap_player # To display the correct winner we need to do one last player swap
 		display
 		puts "Game Ended"
-	end
-			
-		
+		if @won == true
+			puts "#{@current_player_name} Won!"
+		else
+			puts "It was a tie!"
+		end
+	end	
 end
 
 
 # Player class creates a player object and assigns an object to that player.
 class Player
-	attr_accessor :symbol
+	attr_accessor :symbol, :name
 	@@no_of_players = 0
 	def initialize
 		@@no_of_players += 1
